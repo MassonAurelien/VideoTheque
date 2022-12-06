@@ -40,7 +40,7 @@ namespace VideoTheque.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IResult> DeleteGenre([FromRoute] int id)
+        public async Task<IResult> DeleteAgeRating([FromRoute] int id)
         {
             _ageRatingBusiness.DeleteAgeRating(id);
             return Results.Ok();

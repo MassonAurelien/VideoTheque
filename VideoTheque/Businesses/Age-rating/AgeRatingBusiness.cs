@@ -25,7 +25,7 @@ namespace VideoTheque.Businesses.Age_rating
 
             if (ageRating == null)
             {
-                throw new NotFoundException($"Genre '{id}' non trouvé");
+                throw new NotFoundException($"Age Rating '{id}' non trouvé");
             }
 
             return  ageRating;

@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Mapster;
+using Microsoft.AspNetCore.Mvc;
+using System.Reflection;
 using VideoTheque.Businesses.Movies;
+using VideoTheque.Constants;
 using VideoTheque.DTOs;
 using VideoTheque.ViewModels;
 
@@ -19,7 +22,17 @@ namespace VideoTheque.Controllers
         }
 
         [HttpGet]
-        public async Task<List<MovieViewModel>> GetMovies() => (await _moviesBusiness.GetMovies()).Adapt<List<MovieViewModel>>();
+        public async Task<List<MovieViewModel>> GetMovies() => (await _moviesBusiness.GetMovies()).Select(c => new MovieViewModel {
+                Id = c.Id,
+            Director = c.Director,
+            Scenarist = c.Scenarist,
+            Duration = c.Duration,
+            Support = EnumSupports.BluRays.ToString(),
+            AgeRating = c.AgeRating,
+            Genre = c.Genre,
+            Title = c.Title,
+            FirstActor = c.FirstActor
+            }).ToList();
 
         [HttpGet("{id}")]
         public async Task<MovieViewModel> GetMovie([FromRoute] int id) => _moviesBusiness.GetMovie(id).Adapt<MovieViewModel>();

@@ -4,13 +4,13 @@ namespace VideoTheque.Repositories.Movies
 {
     public interface IMoviesRepository
     {
-        Task<List<FilmDto>> GetMovies();
+        Task<List<BluRayDto>> GetMovies();
 
-        ValueTask<FilmDto?> GetMovie(int id);
+        ValueTask<BluRayDto?> GetMovie(int id);
 
-        Task InsertMovie(FilmDto movie);
+        Task InsertMovie(BluRayDto movie);
 
-        Task UpdateMovie(int id, FilmDto movie);
+        Task UpdateMovie(int id, BluRayDto movie);
 
         Task DeleteMovie(int id);
     }

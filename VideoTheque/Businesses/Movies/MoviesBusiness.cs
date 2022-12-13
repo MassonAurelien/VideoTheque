@@ -1,6 +1,9 @@
 ﻿using VideoTheque.Core;
 using VideoTheque.DTOs;
+using VideoTheque.Repositories.Age_Rating;
+using VideoTheque.Repositories.Genres;
 using VideoTheque.Repositories.Movies;
+using VideoTheque.Repositories.Personnes;
 
 namespace VideoTheque.Businesses.Movies
 {
@@ -8,13 +11,33 @@ namespace VideoTheque.Businesses.Movies
     {
 
         private readonly IMoviesRepository _moviesDao;
+        private readonly IPersonnesRepository _personnesDao;
+        private readonly IGenresRepository _genresDao;
+        private readonly IAgeRatingRepository _ageRatingDao;
 
-        public MoviesBusiness(IMoviesRepository moviesDao)
+        public MoviesBusiness(IMoviesRepository moviesDao, IPersonnesRepository personnesDao, IGenresRepository genresDao, IAgeRatingRepository ageRatingDao)
         {
             _moviesDao = moviesDao;
+            _personnesDao = personnesDao;
+            _genresDao = genresDao;
+            _ageRatingDao = ageRatingDao;
         }
 
-        public Task<List<FilmDto>> GetMovies() => _moviesDao.GetMovies();
+        public async Task<List<FilmDto>> GetMovies()
+        {
+            List<FilmDto> films = new List<FilmDto>();
+            foreach (BluRayDto film in (await _moviesDao.GetMovies()))
+            {
+                var scenarist = await _personnesDao.GetPersonne(film.IdScenarist);
+                var acteur = await _personnesDao.GetPersonne(film.IdFirstActor);
+                var directeur = await _personnesDao.GetPersonne(film.IdDirector);
+                var genre = await _genresDao.GetGenre(film.IdGenre);
+                var ageRating = await _ageRatingDao.GetAgeRating(film.IdAgeRating);
+
+                films.Add(new FilmDto(film, acteur.FirstName + ' ' + acteur.LastName, directeur.FirstName+ ' '+ directeur.LastName, scenarist.FirstName + ' ' + scenarist.LastName, genre.Name, ageRating.Name));
+            }
+            return films;
+        }
 
         
 
@@ -26,23 +49,25 @@ namespace VideoTheque.Businesses.Movies
             {
                 throw new NotFoundException($"Movies '{id}' non trouvé");
             }
-
-            return  movies;
+            //var movieDto = new FilmDto(movies);
+            //return  movies;
+            return null;
         }
 
-        public FilmDto InsertMovie(FilmDto movies)
+        public FilmDto InsertMovie(FilmDto movie)
         {
-            if (_moviesDao.InsertMovie(movies).IsFaulted)
+            //if (_moviesDao.InsertMovie(movie).IsFaulted)
             {
-                throw new InternalErrorException($"Erreur lors de l'insertion du movie {movies.Title}");
+                throw new InternalErrorException($"Erreur lors de l'insertion du movie {movie.Title}");
             }
 
-            return movies;
+            //return movie;
+            return null;
         }
 
         public void UpdateMovie(int id, FilmDto movies)
         {
-            if (_moviesDao.UpdateMovie(id, movies).IsFaulted)
+            //if (_moviesDao.UpdateMovie(id, movies).IsFaulted)
             {
                 throw new InternalErrorException($"Erreur lors de la modification de l'host {movies.Title}");
             }

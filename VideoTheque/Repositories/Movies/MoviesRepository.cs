@@ -12,17 +12,17 @@ namespace VideoTheque.Repositories.Movies
         {
             _db = db;
         }
-        public Task<List<FilmDto>> GetMovies() => _db.BluRays.ToListAsync();
+        public Task<List<BluRayDto>> GetMovies() => _db.BluRays.ToListAsync();
 
-        public ValueTask<FilmDto?> GetMovie(int id) => _db.BluRays.FindAsync(id);
+        public ValueTask<BluRayDto?> GetMovie(int id) => _db.BluRays.FindAsync(id);
 
-        public Task InsertMovie(FilmDto movie)
+        public Task InsertMovie(BluRayDto movie)
         {
             _db.BluRays.AddAsync(movie);
             return _db.SaveChangesAsync();
         }
 
-        public Task UpdateMovie(int id, FilmDto movie)
+        public Task UpdateMovie(int id, BluRayDto movie)
         {
             var movieToUpdate = _db.BluRays.FindAsync(id).Result;
 

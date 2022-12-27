@@ -26,7 +26,9 @@ namespace VideoTheque.Businesses.Movies
         public async Task<List<FilmDto>> GetMovies()
         {
             List<FilmDto> films = new List<FilmDto>();
-            foreach (BluRayDto film in (await _moviesDao.GetMovies()))
+            var brs = await _moviesDao.GetMovies();
+            System.Console.WriteLine(brs.Count);
+            foreach (BluRayDto film in brs)
             {
                 var scenarist = await _personnesDao.GetPersonne(film.IdScenarist);
                 var acteur = await _personnesDao.GetPersonne(film.IdFirstActor);
@@ -41,17 +43,21 @@ namespace VideoTheque.Businesses.Movies
 
         
 
-        public FilmDto GetMovie(int id)
+        public async Task<FilmDto> GetMovie(int id)
         {
-            var movies = _moviesDao.GetMovie(id).Result;
+            var movie = _moviesDao.GetMovie(id).Result;
 
-            if (movies == null)
+            if (movie == null)
             {
                 throw new NotFoundException($"Movies '{id}' non trouvé");
             }
-            //var movieDto = new FilmDto(movies);
-            //return  movies;
-            return null;
+            var scenarist = await _personnesDao.GetPersonne(movie.IdScenarist);
+            var acteur = await _personnesDao.GetPersonne(movie.IdFirstActor);
+            var directeur = await _personnesDao.GetPersonne(movie.IdDirector);
+            var genre = await _genresDao.GetGenre(movie.IdGenre);
+            var ageRating = await _ageRatingDao.GetAgeRating(movie.IdAgeRating);
+            var filmDto = new FilmDto(movie, acteur.FirstName + ' ' + acteur.LastName, directeur.FirstName + ' ' + directeur.LastName, scenarist.FirstName + ' ' + scenarist.LastName, genre.Name, ageRating.Name);
+            return filmDto;
         }
 
         public FilmDto InsertMovie(FilmDto movie)

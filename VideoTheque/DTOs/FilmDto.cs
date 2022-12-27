@@ -1,4 +1,6 @@
-﻿namespace VideoTheque.DTOs
+﻿using VideoTheque.ViewModels;
+
+namespace VideoTheque.DTOs
 {
     public class FilmDto
     {

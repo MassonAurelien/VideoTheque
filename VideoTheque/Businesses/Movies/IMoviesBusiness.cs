@@ -6,7 +6,7 @@ namespace VideoTheque.Businesses.Movies
     {
         Task<List<FilmDto>> GetMovies();
 
-        FilmDto GetMovie(int id);
+        Task<FilmDto> GetMovie(int id);
 
         FilmDto InsertMovie(FilmDto movie);
 

@@ -23,7 +23,7 @@ namespace VideoTheque.Controllers
 
         [HttpGet]
         public async Task<List<MovieViewModel>> GetMovies() => (await _moviesBusiness.GetMovies()).Select(c => new MovieViewModel {
-                Id = c.Id,
+            Id = c.Id,
             Director = c.Director,
             Scenarist = c.Scenarist,
             Duration = c.Duration,
@@ -35,7 +35,22 @@ namespace VideoTheque.Controllers
             }).ToList();
 
         [HttpGet("{id}")]
-        public async Task<MovieViewModel> GetMovie([FromRoute] int id) => _moviesBusiness.GetMovie(id).Adapt<MovieViewModel>();
+        public async Task<MovieViewModel> GetMovie([FromRoute] int id)
+        {
+            var movie = await _moviesBusiness.GetMovie(id);
+            return new MovieViewModel
+            {
+                Id = movie.Id,
+                Director = movie.Director,
+                Scenarist = movie.Scenarist,
+                Duration = movie.Duration,
+                Support = EnumSupports.BluRays.ToString(),
+                AgeRating = movie.AgeRating,
+                Genre = movie.Genre,
+                Title = movie.Title,
+                FirstActor = movie.FirstActor
+            };
+        }
 
         [HttpPost]
         public async Task<IResult> InsentMovie([FromBody] MovieViewModel movieVM)

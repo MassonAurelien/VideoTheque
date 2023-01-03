@@ -7,7 +7,7 @@ using VideoTheque.ViewModels;
 namespace VideoTheque.Controllers
 {
     [ApiController]
-    [Route("age-rating")]
+    [Route("age-ratings")]
     public class AgeRatingController : ControllerBase
     {
         private readonly IAgeRatingBusiness _ageRatingBusiness;

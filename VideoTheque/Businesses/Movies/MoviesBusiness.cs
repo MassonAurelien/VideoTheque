@@ -1,4 +1,5 @@
-﻿using VideoTheque.Core;
+﻿using System.Collections.Generic;
+using VideoTheque.Core;
 using VideoTheque.DTOs;
 using VideoTheque.Repositories.Age_Rating;
 using VideoTheque.Repositories.Genres;
@@ -62,20 +63,60 @@ namespace VideoTheque.Businesses.Movies
 
         public FilmDto InsertMovie(FilmDto movie)
         {
-            //if (_moviesDao.InsertMovie(movie).IsFaulted)
+
+            int genreId = FindGenre(movie.Genre).Result;
+            int scenarist = FindPersonnage(movie.Scenarist).Result;
+            int acteur = FindPersonnage(movie.FirstActor).Result;
+            int directeur = FindPersonnage(movie.Director).Result;
+            int ageRating = FindAgeRating(movie.AgeRating).Result;
+
+            BluRayDto bluRayDto = new BluRayDto();
+            bluRayDto.Duration = movie.Duration;
+            bluRayDto.IdDirector = directeur;
+            bluRayDto.Title = movie.Title;
+            bluRayDto.IdGenre = genreId;
+            bluRayDto.IdAgeRating = ageRating;
+            bluRayDto.IdFirstActor = acteur;
+            bluRayDto.IdScenarist= scenarist;
+            if(genreId == -1 || scenarist == -1 || acteur == -1 || directeur == -1 || ageRating == -1)
+            {
+                throw new InternalErrorException($"Erreur lors de l'insertion du movie {movie.Title}. Argument inconnu");
+            }
+
+            if (_moviesDao.InsertMovie(bluRayDto).IsFaulted)
             {
                 throw new InternalErrorException($"Erreur lors de l'insertion du movie {movie.Title}");
             }
 
-            //return movie;
-            return null;
+            return movie;
         }
 
-        public void UpdateMovie(int id, FilmDto movies)
+        public void UpdateMovie(int id, FilmDto movie)
         {
-            //if (_moviesDao.UpdateMovie(id, movies).IsFaulted)
+            int genreId = FindGenre(movie.Genre).Result;
+            int scenarist = FindPersonnage(movie.Scenarist).Result;
+            int acteur = FindPersonnage(movie.FirstActor).Result;
+            int directeur = FindPersonnage(movie.Director).Result;
+            int ageRating = FindAgeRating(movie.AgeRating).Result;
+
+            BluRayDto bluRayDto = new BluRayDto();
+            bluRayDto.Duration = movie.Duration;
+            bluRayDto.IdDirector = directeur;
+            bluRayDto.Title = movie.Title;
+            bluRayDto.IdGenre = genreId;
+            bluRayDto.IdAgeRating = ageRating;
+            bluRayDto.IdFirstActor = acteur;
+            bluRayDto.IdScenarist = scenarist;
+
+            if (genreId == -1 || scenarist == -1 || acteur == -1 || directeur == -1 || ageRating == -1)
             {
-                throw new InternalErrorException($"Erreur lors de la modification de l'host {movies.Title}");
+                throw new InternalErrorException($"Erreur lors de l'insertion du movie {movie.Title}. Argument inconnu");
+            }
+
+
+            if (_moviesDao.UpdateMovie(id, bluRayDto).IsFaulted)
+            {
+                throw new InternalErrorException($"Erreur lors de la modification de l'host {movie.Title}");
             }
         }
 
@@ -85,6 +126,39 @@ namespace VideoTheque.Businesses.Movies
             {
                 throw new InternalErrorException($"Erreur lors de la suppression du movie : {id}");
             }
+        }
+
+        private async Task<int> FindGenre(string name)
+        {
+            List<GenreDto> genres = await _genresDao.GetGenres();
+            foreach (GenreDto genre in genres)
+            {
+                if (genre.Name.Equals(name)) return genre.Id;
+            }
+            return -1;
+        }
+
+        private async Task<int> FindAgeRating(string name)
+        {
+            List<AgeRatingDto> ages = await _ageRatingDao.GetAgeRatings();
+            foreach (AgeRatingDto age in ages)
+            {
+                if (age.Name.Equals(name)) return age.Id;
+                else if (age.Abreviation.Equals(name)) return age.Id;
+            }
+            return -1;
+        }
+
+        private async Task<int> FindPersonnage(string name)
+        {
+            List<PersonneDto> personnages = await _personnesDao.GetPersonnes();
+            var firstName = name.Split(' ')[0];
+            var surname = name.Split(' ')[1];
+            foreach (PersonneDto personnage in personnages)
+            {
+                if (personnage.FirstName.Equals(firstName) && personnage.LastName.Equals(surname)) return personnage.Id;
+            }
+            return -1;
         }
     }
 }

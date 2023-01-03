@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using VideoTheque.Core;
+﻿using VideoTheque.Core;
 using VideoTheque.DTOs;
 using VideoTheque.Repositories.Age_Rating;
 using VideoTheque.Repositories.Genres;
 using VideoTheque.Repositories.Movies;
 using VideoTheque.Repositories.Personnes;
+using VideoTheque.Repositories.Hosts;
 
 namespace VideoTheque.Businesses.Movies
 {
@@ -15,20 +15,21 @@ namespace VideoTheque.Businesses.Movies
         private readonly IPersonnesRepository _personnesDao;
         private readonly IGenresRepository _genresDao;
         private readonly IAgeRatingRepository _ageRatingDao;
+        private readonly IHostsRepository _hostsDao;
 
-        public MoviesBusiness(IMoviesRepository moviesDao, IPersonnesRepository personnesDao, IGenresRepository genresDao, IAgeRatingRepository ageRatingDao)
+        public MoviesBusiness(IMoviesRepository moviesDao, IPersonnesRepository personnesDao, IGenresRepository genresDao, IAgeRatingRepository ageRatingDao, IHostsRepository hostDao)
         {
             _moviesDao = moviesDao;
             _personnesDao = personnesDao;
             _genresDao = genresDao;
             _ageRatingDao = ageRatingDao;
+            _hostsDao = hostDao;
         }
 
         public async Task<List<FilmDto>> GetMovies()
         {
             List<FilmDto> films = new List<FilmDto>();
             var brs = await _moviesDao.GetMovies();
-            System.Console.WriteLine(brs.Count);
             foreach (BluRayDto film in brs)
             {
                 var scenarist = await _personnesDao.GetPersonne(film.IdScenarist);
@@ -37,12 +38,26 @@ namespace VideoTheque.Businesses.Movies
                 var genre = await _genresDao.GetGenre(film.IdGenre);
                 var ageRating = await _ageRatingDao.GetAgeRating(film.IdAgeRating);
 
-                films.Add(new FilmDto(film, acteur.FirstName + ' ' + acteur.LastName, directeur.FirstName+ ' '+ directeur.LastName, scenarist.FirstName + ' ' + scenarist.LastName, genre.Name, ageRating.Name));
+                films.Add(new FilmDto(film, acteur.FirstName + ' ' + acteur.LastName, directeur.FirstName + ' ' + directeur.LastName, scenarist.FirstName + ' ' + scenarist.LastName, genre.Name, ageRating.Name));
             }
             return films;
         }
 
-        
+        public async Task<List<FilmDto>> GetMovies(int idPartenaire)
+        {
+            List<FilmDto> films = new List<FilmDto>();
+            HttpClient client = new HttpClient();
+            HostDto host = await _hostsDao.GetHost(idPartenaire);
+            String path = host.Url + "/emprunts";
+            HttpResponseMessage response = await client.GetAsync(path);
+            if (response.IsSuccessStatusCode)
+            {
+                films = await response.Content.ReadFromJsonAsync<List<FilmDto>>();
+            }
+            return films;
+        }
+
+
 
         public async Task<FilmDto> GetMovie(int id)
         {
@@ -61,6 +76,16 @@ namespace VideoTheque.Businesses.Movies
             return filmDto;
         }
 
+        public async Task<FilmDto> GetMovie(int id, int partenaire)
+        {
+            HttpClient client = new HttpClient();
+            HostDto host = await _hostsDao.GetHost(partenaire);
+            String path = host.Url + "/emprunts/" + id;
+            HttpResponseMessage response = await client.PostAsync(path, null);
+            response.EnsureSuccessStatusCode();
+            return null;
+        }
+
         public FilmDto InsertMovie(FilmDto movie)
         {
 
@@ -77,8 +102,8 @@ namespace VideoTheque.Businesses.Movies
             bluRayDto.IdGenre = genreId;
             bluRayDto.IdAgeRating = ageRating;
             bluRayDto.IdFirstActor = acteur;
-            bluRayDto.IdScenarist= scenarist;
-            if(genreId == -1 || scenarist == -1 || acteur == -1 || directeur == -1 || ageRating == -1)
+            bluRayDto.IdScenarist = scenarist;
+            if (genreId == -1 || scenarist == -1 || acteur == -1 || directeur == -1 || ageRating == -1)
             {
                 throw new InternalErrorException($"Erreur lors de l'insertion du movie {movie.Title}. Argument inconnu");
             }

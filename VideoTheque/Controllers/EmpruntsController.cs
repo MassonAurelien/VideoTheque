@@ -50,5 +50,12 @@ namespace VideoTheque.Controllers
                 FirstActor = movie.FirstActor.Adapt<PersonneViewModel>()
             };
         }
+
+        [HttpDelete("{name}")]
+        public async Task<IResult> DeleteMovie([FromRoute] string name)
+        {
+            _empruntsBusiness.DeleteFilm(name);
+            return Results.Ok();
+        }
     }
 }

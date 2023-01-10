@@ -22,9 +22,18 @@ namespace VideoTheque.Businesses.Emprunts
             _ageRatingDao = ageRatingDao;
         }
 
-        public void DeleteFilm(string name)
+        public async void DeleteFilm(string name)
         {
-            throw new NotImplementedException();
+            var brs = await _moviesDao.GetMovies();
+            foreach(BluRayDto film in brs)
+            {
+                if (film.Title.Equals(name))
+                {
+                    film.IsAvailable = true;
+                    await _moviesDao.UpdateMovie(film.Id, film);
+                    break;
+                }
+            }
         }
 
         public async Task<EmpruntsDto> PostFilm(int id)

@@ -13,4 +13,5 @@
         public bool IsAvailable { get; set; }
         public int? IdOwner { get; set; }
     }
+
 }

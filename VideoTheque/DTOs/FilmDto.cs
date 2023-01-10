@@ -25,5 +25,8 @@ namespace VideoTheque.DTOs
             AgeRating = ageRating;
             Genre = genre;
         }
+
+        public FilmDto() { }
+
     }
 }

@@ -6,7 +6,7 @@ namespace VideoTheque.Businesses.Emprunts
     {
         Task<List<FilmDto>> GetFilms();
 
-        Task<FilmDto> PostFilm(int id);
+        Task<EmpruntsDto> PostFilm(int id);
 
         void DeleteFilm(string name);
     }

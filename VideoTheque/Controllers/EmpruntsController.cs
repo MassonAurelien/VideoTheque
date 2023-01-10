@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Mapster;
+using Microsoft.AspNetCore.Mvc;
 using VideoTheque.Businesses.Emprunts;
 using VideoTheque.Constants;
 using VideoTheque.ViewModels;
@@ -31,5 +32,23 @@ namespace VideoTheque.Controllers
             Title = c.Title,
             FirstActor = c.FirstActor
         }).ToList();
+
+        [HttpPost("{id}")]
+        public async Task<EmpruntsViewModel> PostMovie([FromRoute] int id)
+        {
+            var movie = await _empruntsBusiness.PostFilm(id);
+            return new EmpruntsViewModel
+            {
+                Id = movie.Id,
+                Director = movie.Director.Adapt<PersonneViewModel>(),
+                Scenarist = movie.Scenarist.Adapt<PersonneViewModel>(),
+                Duration = movie.Duration,
+                Support = EnumSupports.BluRays.ToString(),
+                AgeRating = movie.AgeRating.Adapt<AgeRatingModel>(),
+                Genre = movie.Genre.Adapt<GenreViewModel>(),
+                Title = movie.Title,
+                FirstActor = movie.FirstActor.Adapt<PersonneViewModel>()
+            };
+        }
     }
 }

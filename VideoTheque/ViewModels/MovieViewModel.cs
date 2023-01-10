@@ -5,34 +5,34 @@ namespace VideoTheque.ViewModels
 {
     public class MovieViewModel
     {
-        [JsonPropertyName("id")]
+        [JsonPropertyName("Id")]
         public int Id { get; set; }
 
-        [JsonPropertyName("realisateur")]
+        [JsonPropertyName("Director")]
         [Required]
         public string Director { get; set; }
 
-        [JsonPropertyName("scenariste")]
+        [JsonPropertyName("Scenarist")]
         [Required]
         public string Scenarist { get; set; }
 
-        [JsonPropertyName("duree")]
+        [JsonPropertyName("Duration")]
         [Required]
         public int Duration { get; set; }
 
-        [JsonPropertyName("support")]
+        [JsonPropertyName("Support")]
         [Required]
         public string Support { get; set; }
 
-        [JsonPropertyName("age-rating")]
+        [JsonPropertyName("AgeRating")]
         [Required]
         public string AgeRating { get; set; }
 
-        [JsonPropertyName("genre")]
+        [JsonPropertyName("Genre")]
         [Required]
         public string Genre { get; set; }
 
-        [JsonPropertyName("titre")]
+        [JsonPropertyName("Title")]
         [Required]
         public string Title { get; set; }
 

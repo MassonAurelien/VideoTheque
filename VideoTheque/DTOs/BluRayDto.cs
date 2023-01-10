@@ -2,6 +2,25 @@
 {
     public class BluRayDto
     {
+        private int acteur;
+        private int director;
+        private int scenarist;
+        private int ageRating;
+        private int genre;
+        private int partenaire;
+
+        public BluRayDto(string title, int duration, int acteur, int director, int scenarist, int ageRating, int genre, int partenaire)
+        {
+            Title = title;
+            Duration = duration;
+            this.acteur = acteur;
+            this.director = director;
+            this.scenarist = scenarist;
+            this.ageRating = ageRating;
+            this.genre = genre;
+            this.partenaire = partenaire;
+        }
+
         public int Id { get; set; }
         public string Title { get; set; }
         public long Duration { get; set; }

@@ -34,7 +34,7 @@ namespace VideoTheque.Controllers
             FirstActor = c.FirstActor
         }).ToList();
 
-        [HttpGet("{partenaire}")]
+        [HttpGet("partenaire/{partenaire}")]
         public async Task<List<MovieViewModel>> GetMovies([FromRoute] int partenaire) => (await _moviesBusiness.GetMovies(partenaire)).Select(c => new MovieViewModel
         {
             Id = c.Id,
@@ -52,6 +52,24 @@ namespace VideoTheque.Controllers
         public async Task<MovieViewModel> GetMovie([FromRoute] int id)
         {
             var movie = await _moviesBusiness.GetMovie(id);
+            return new MovieViewModel
+            {
+                Id = movie.Id,
+                Director = movie.Director,
+                Scenarist = movie.Scenarist,
+                Duration = movie.Duration,
+                Support = EnumSupports.BluRays.ToString(),
+                AgeRating = movie.AgeRating,
+                Genre = movie.Genre,
+                Title = movie.Title,
+                FirstActor = movie.FirstActor
+            };
+        }
+
+        [HttpGet("partenaire/{idFilm}/{idPartenaire}")]
+        public async Task<MovieViewModel> GetMovie([FromRoute] int idFilm, int idPartenaire)
+        {
+            var movie = await _moviesBusiness.GetMovie(idFilm, idPartenaire);
             return new MovieViewModel
             {
                 Id = movie.Id,

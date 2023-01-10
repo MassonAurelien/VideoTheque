@@ -80,9 +80,57 @@ namespace VideoTheque.Businesses.Movies
         {
             HttpClient client = new HttpClient();
             HostDto host = await _hostsDao.GetHost(partenaire);
-            String path = host.Url + "/emprunts/" + id;
+            String path = host.Url + "emprunts/" + id;
             HttpResponseMessage response = await client.PostAsync(path, null);
             response.EnsureSuccessStatusCode();
+            EmpruntsDto emprunt = await response.Content.ReadFromJsonAsync<EmpruntsDto>();
+            int scenarist = 0;
+            int acteur = 0;
+            int director = 0;
+            int genre = 0;
+            int ageRating = 0;
+            if(emprunt != null)
+            {
+                scenarist = await FindPersonnage(emprunt.Scenarist.FirstName + " " + emprunt.Scenarist.LastName);
+                if (scenarist == 0)
+                {
+                    _personnesDao.InsertPersonne(emprunt.Scenarist);
+                    scenarist = await FindPersonnage(emprunt.Scenarist.FirstName + " " + emprunt.Scenarist.LastName);
+                }
+                acteur = await FindPersonnage(emprunt.FirstActor.FirstName + " " + emprunt.FirstActor.LastName);
+                if (acteur == 0)
+                {
+                    _personnesDao.InsertPersonne(emprunt.FirstActor);
+                    acteur = await FindPersonnage(emprunt.FirstActor.FirstName + " " + emprunt.FirstActor.LastName);
+                }
+                director = await FindPersonnage(emprunt.Director.FirstName + " " + emprunt.Director.LastName);
+                if (director == 0)
+                {
+                    _personnesDao.InsertPersonne(emprunt.Director);
+                    director = await FindPersonnage(emprunt.Director.FirstName + " " + emprunt.Director.LastName);
+                }
+                ageRating = await FindAgeRating(emprunt.AgeRating.Name);
+                if (ageRating == 0)
+                {
+                    _ageRatingDao.InsertAgeRating(emprunt.AgeRating);
+                    ageRating = await FindPersonnage(emprunt.AgeRating.Name);
+                }
+                genre = await FindGenre(emprunt.Genre.Name);
+                if (genre == 0)
+                {
+                    _genresDao.InsertGenre(emprunt.Genre);
+                    genre = await FindGenre(emprunt.Genre.Name);
+                }
+
+                BluRayDto film = new BluRayDto(emprunt.Title,emprunt.Duration,acteur,director,scenarist,ageRating,genre,partenaire);
+                _moviesDao.InsertMovie(film);
+                return (new FilmDto(film, emprunt.FirstActor.FirstName + " " + emprunt.FirstActor.LastName,
+                    emprunt.Director.FirstName + " " + emprunt.Director.LastName,
+                    emprunt.FirstActor.FirstName + " " + emprunt.FirstActor.LastName,
+                    emprunt.Genre.Name,
+                    emprunt.AgeRating.Name));
+
+            }
             return null;
         }
 

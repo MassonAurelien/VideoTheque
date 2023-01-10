@@ -15,6 +15,7 @@ using VideoTheque.Supports.ISupportsBusiness;
 using VideoTheque.Businesses.Personnes;
 using VideoTheque.Repositories.Movies;
 using VideoTheque.Businesses.Movies;
+using VideoTheque.Businesses.Emprunts;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +44,8 @@ builder.Services.AddScoped(typeof(ISupportsRepository), typeof(SupportsRepositor
 builder.Services.AddScoped(typeof(ISupportsBusiness), typeof(SupportsBusiness));
 builder.Services.AddScoped(typeof(IMoviesRepository), typeof(MoviesRepository));
 builder.Services.AddScoped(typeof(IMoviesBusiness), typeof(MoviesBusiness));
+builder.Services.AddScoped(typeof(IEmpruntsBusiness), typeof(EmpruntsBusiness));
+
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -70,12 +73,13 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "VidéoThèque API V1");
-    });
 }
+
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "VidéoThèque API V1");
+});
 
 app.UseRouting();
 
